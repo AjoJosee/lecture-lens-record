@@ -2,22 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Plus, Mic, FileText, LogOut, User } from "lucide-react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Mic, 
-  Download, 
-  Clock, 
-  Calendar, 
-  FileText, 
-  User,
-  LogOut,
-  Plus
-} from "lucide-react";
-import jsPDF from 'jspdf';
+import PageHeader from "@/components/ui/PageHeader";
+import SessionCard from "@/components/dashboard/SessionCard";
+import TranscriptViewer from "@/components/dashboard/TranscriptViewer";
 
-interface LectureSession {
+interface SessionData {
   id: number;
   title: string;
   date: string;
@@ -27,11 +19,11 @@ interface LectureSession {
 }
 
 const Dashboard = () => {
-  const [sessions, setSessions] = useState<LectureSession[]>([]);
-  const [currentSession, setCurrentSession] = useState<LectureSession | null>(null);
-  const [user, setUser] = useState<{name: string, email: string} | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sessions, setSessions] = useLocalStorage<SessionData[]>('lectureSessions', []);
+  const [selectedSession, setSelectedSession] = useState<SessionData | null>(null);
+  const [user, setUser] = useState<{name: string, email: string} | null>(null);
 
   useEffect(() => {
     // Load user data
@@ -42,20 +34,20 @@ const Dashboard = () => {
     }
     setUser(JSON.parse(userData));
 
-    // Load sessions
-    const sessionsData = localStorage.getItem('lectureSessions');
-    const parsedSessions = sessionsData ? JSON.parse(sessionsData) : [];
-    setSessions(parsedSessions);
-
-    // Load current session if exists
-    const currentSessionData = localStorage.getItem('currentSession');
-    if (currentSessionData) {
-      setCurrentSession(JSON.parse(currentSessionData));
-      localStorage.removeItem('currentSession'); // Clear after loading
-    } else if (parsedSessions.length > 0) {
-      setCurrentSession(parsedSessions[0]);
+    // Check for a newly created session
+    const currentSession = localStorage.getItem('currentSession');
+    if (currentSession) {
+      const session = JSON.parse(currentSession);
+      setSelectedSession(session);
+      localStorage.removeItem('currentSession');
+    } else if (sessions.length > 0) {
+      setSelectedSession(sessions[0]);
     }
-  }, [navigate]);
+  }, [navigate, sessions]);
+
+  const handleSessionClick = (session: SessionData) => {
+    setSelectedSession(session);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -64,68 +56,8 @@ const Dashboard = () => {
     navigate('/');
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
-
-  const downloadPDF = (session: LectureSession) => {
-    try {
-      const doc = new jsPDF();
-      
-      // Title
-      doc.setFontSize(20);
-      doc.text(session.title, 20, 30);
-      
-      // Date and duration
-      doc.setFontSize(12);
-      doc.text(`Date: ${formatDate(session.date)}`, 20, 45);
-      doc.text(`Duration: ${formatDuration(session.duration)}`, 20, 55);
-      
-      // Summary section
-      doc.setFontSize(16);
-      doc.text('Summary', 20, 75);
-      doc.setFontSize(11);
-      const summaryLines = doc.splitTextToSize(session.summary, 170);
-      doc.text(summaryLines, 20, 85);
-      
-      // Transcript section
-      const summaryHeight = summaryLines.length * 5;
-      doc.setFontSize(16);
-      doc.text('Transcript', 20, 95 + summaryHeight);
-      doc.setFontSize(10);
-      const transcriptLines = doc.splitTextToSize(session.transcript, 170);
-      doc.text(transcriptLines, 20, 105 + summaryHeight);
-      
-      // Save
-      doc.save(`${session.title.replace(/\s+/g, '_')}_transcript.pdf`);
-      
-      toast({
-        title: "PDF Downloaded",
-        description: "Your transcript has been saved successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Download Failed",
-        description: "There was an error generating the PDF",
-        variant: "destructive",
-      });
-    }
-  };
-
   const addSampleSession = () => {
-    const sampleSession: LectureSession = {
+    const sampleSession: SessionData = {
       id: Date.now(),
       title: `Sample Lecture ${sessions.length + 1}`,
       date: new Date().toISOString(),
@@ -136,8 +68,7 @@ const Dashboard = () => {
 
     const updatedSessions = [sampleSession, ...sessions];
     setSessions(updatedSessions);
-    localStorage.setItem('lectureSessions', JSON.stringify(updatedSessions));
-    setCurrentSession(sampleSession);
+    setSelectedSession(sampleSession);
     
     toast({
       title: "Sample Session Added",
@@ -159,7 +90,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Welcome back, {user.name}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button onClick={() => navigate('/recorder')} className="bg-gradient-primary hover:bg-primary-hover">
+            <Button onClick={() => navigate('/recorder')} className="bg-accent hover:bg-accent/90 text-white">
               <Mic className="h-4 w-4 mr-2" />
               New Recording
             </Button>
@@ -170,24 +101,45 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Sessions List */}
-          <div className="lg:col-span-1">
-            <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Sidebar - Recent Sessions */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Quick Actions */}
+            <Card className="bg-gradient-card">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Recent Sessions</span>
-                  <Badge variant="secondary">{sessions.length}</Badge>
+                <CardTitle className="flex items-center">
+                  <Mic className="h-5 w-5 mr-2" />
+                  Quick Actions
                 </CardTitle>
-                <CardDescription>
-                  Your recorded lectures and transcripts
-                </CardDescription>
               </CardHeader>
               <CardContent>
+                <Button 
+                  onClick={() => navigate('/recorder')} 
+                  className="w-full bg-accent hover:bg-accent/90 text-white"
+                  size="lg"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  New Recording
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recent Sessions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Recent Sessions
+                </CardTitle>
+                <CardDescription>
+                  {sessions.length} total recordings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
                 {sessions.length === 0 ? (
                   <div className="text-center py-8">
-                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">No sessions yet</p>
+                    <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground mb-4">No recordings yet</p>
                     <div className="space-y-2">
                       <Button onClick={() => navigate('/recorder')} className="w-full">
                         <Plus className="h-4 w-4 mr-2" />
@@ -199,103 +151,45 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ) : (
-                  <ScrollArea className="h-96">
-                    <div className="space-y-3">
-                      {sessions.map((session) => (
-                        <Card 
-                          key={session.id}
-                          className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                            currentSession?.id === session.id ? 'ring-2 ring-primary' : ''
-                          }`}
-                          onClick={() => setCurrentSession(session)}
-                        >
-                          <CardContent className="p-4">
-                            <h3 className="font-semibold text-sm mb-2">{session.title}</h3>
-                            <div className="flex items-center text-xs text-muted-foreground space-x-4">
-                              <div className="flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                {formatDate(session.date)}
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {formatDuration(session.duration)}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className={`${
+                          selectedSession?.id === session.id ? 'ring-2 ring-primary rounded-lg' : ''
+                        }`}
+                      >
+                        <SessionCard
+                          session={session}
+                          onClick={() => handleSessionClick(session)}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Session Details */}
+          {/* Main Content - Transcript View */}
           <div className="lg:col-span-2">
-            {currentSession ? (
-              <div className="space-y-6">
-                {/* Session Header */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{currentSession.title}</CardTitle>
-                        <CardDescription>
-                          {formatDate(currentSession.date)} • {formatDuration(currentSession.duration)}
-                        </CardDescription>
-                      </div>
-                      <Button onClick={() => downloadPDF(currentSession)} className="bg-accent hover:bg-accent/90">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download PDF
-                      </Button>
-                    </div>
-                  </CardHeader>
-                </Card>
-
-                {/* Summary */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-foreground leading-relaxed">
-                      {currentSession.summary}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Transcript */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Transcript</CardTitle>
-                    <CardDescription>
-                      Full transcription of your lecture
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-96 w-full rounded border p-4">
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                        {currentSession.transcript}
-                      </p>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              </div>
+            {selectedSession ? (
+              <TranscriptViewer session={selectedSession} />
             ) : (
-              <Card>
-                <CardContent className="flex items-center justify-center h-96">
-                  <div className="text-center">
-                    <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">No Session Selected</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Select a session from the list to view its transcript and summary
-                    </p>
-                    <Button onClick={() => navigate('/recorder')}>
-                      <Mic className="h-4 w-4 mr-2" />
-                      Start Recording
-                    </Button>
-                  </div>
+              <Card className="h-96 flex items-center justify-center">
+                <CardContent className="text-center">
+                  <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                  <CardTitle className="mb-2">No Session Selected</CardTitle>
+                  <CardDescription className="mb-6">
+                    Select a session from the sidebar or create a new recording to get started
+                  </CardDescription>
+                  <Button 
+                    onClick={() => navigate('/recorder')}
+                    className="bg-accent hover:bg-accent/90 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create New Recording
+                  </Button>
                 </CardContent>
               </Card>
             )}
