@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
@@ -7,10 +8,16 @@ import RecordingControls from "@/components/recording/RecordingControls";
 import RecordingStatus from "@/components/recording/RecordingStatus";
 import AudioUpload from "@/components/recording/AudioUpload";
 import RecordingInstructions from "@/components/recording/RecordingInstructions";
+import SessionNameDialog from "@/components/recording/SessionNameDialog";
 
 const Recorder = () => {
   const navigate = useNavigate();
   const { state, actions } = useAudioRecorder();
+
+  const getDefaultSessionName = () => {
+    const now = new Date();
+    return `Lecture ${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,6 +66,14 @@ const Recorder = () => {
 
           <RecordingInstructions />
         </div>
+
+        {/* Session Name Dialog */}
+        <SessionNameDialog
+          open={state.showNameDialog}
+          onClose={actions.cancelSave}
+          onSave={actions.saveSession}
+          defaultName={getDefaultSessionName()}
+        />
       </div>
     </div>
   );
