@@ -104,26 +104,6 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Sidebar - Recent Sessions */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Quick Actions */}
-            <Card className="bg-gradient-card">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Mic className="h-5 w-5 mr-2" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={() => navigate('/recorder')} 
-                  className="w-full bg-accent hover:bg-accent/90 text-white"
-                  size="lg"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  New Recording
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Recent Sessions */}
             <Card>
               <CardHeader>
