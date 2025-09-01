@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
@@ -7,6 +8,7 @@ import RecordingControls from "@/components/recording/RecordingControls";
 import RecordingStatus from "@/components/recording/RecordingStatus";
 import AudioUpload from "@/components/recording/AudioUpload";
 import RecordingInstructions from "@/components/recording/RecordingInstructions";
+import SessionNameDialog from "@/components/recording/SessionNameDialog";
 
 const Recorder = () => {
   const navigate = useNavigate();
@@ -60,6 +62,12 @@ const Recorder = () => {
           <RecordingInstructions />
         </div>
       </div>
+
+      <SessionNameDialog
+        open={state.showNameDialog}
+        onOpenChange={actions.setShowNameDialog}
+        onConfirm={actions.handleSessionNameConfirm}
+      />
     </div>
   );
 };

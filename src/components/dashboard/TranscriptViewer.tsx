@@ -1,9 +1,11 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Download, FileText, Clock, Calendar } from "lucide-react";
 import jsPDF from 'jspdf';
+import AudioPlayer from './AudioPlayer';
 
 interface SessionData {
   id: number;
@@ -12,6 +14,7 @@ interface SessionData {
   duration: number;
   transcript: string;
   summary: string;
+  audioUrl?: string;
 }
 
 interface TranscriptViewerProps {
@@ -95,6 +98,14 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
           </div>
         </CardHeader>
       </Card>
+
+      {/* Audio Player - only show if audioUrl exists */}
+      {session.audioUrl && (
+        <AudioPlayer
+          audioUrl={session.audioUrl}
+          transcript={session.transcript}
+        />
+      )}
 
       {/* Summary */}
       <Card>
