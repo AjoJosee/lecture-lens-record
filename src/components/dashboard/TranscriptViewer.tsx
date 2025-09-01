@@ -1,9 +1,13 @@
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, FileText, Clock, Calendar } from "lucide-react";
+import { Download, FileText, Clock, Calendar, Headphones } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import jsPDF from 'jspdf';
+import AudioPlayer from "./AudioPlayer";
 
 interface SessionData {
   id: number;
@@ -12,6 +16,7 @@ interface SessionData {
   duration: number;
   transcript: string;
   summary: string;
+  audioUrl?: string;
 }
 
 interface TranscriptViewerProps {
@@ -19,6 +24,8 @@ interface TranscriptViewerProps {
 }
 
 const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
+  const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -69,12 +76,12 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
   return (
     <div className="space-y-6">
       {/* Session Header */}
-      <Card className="bg-gradient-card">
+      <Card className="bg-gradient-card border-primary/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-2xl flex items-center">
-                <FileText className="h-6 w-6 mr-2" />
+                <FileText className="h-6 w-6 mr-2 text-primary" />
                 {session.title}
               </CardTitle>
               <CardDescription className="flex items-center space-x-4 mt-2">
@@ -82,13 +89,13 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
                   <Calendar className="h-4 w-4 mr-1" />
                   {formatDate(session.date)}
                 </span>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
                   <Clock className="h-3 w-3 mr-1" />
                   {formatTime(session.duration)}
                 </Badge>
               </CardDescription>
             </div>
-            <Button onClick={downloadPDF} className="bg-accent hover:bg-accent/90">
+            <Button onClick={downloadPDF} className="bg-primary hover:bg-primary-hover">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
@@ -96,34 +103,77 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
         </CardHeader>
       </Card>
 
-      {/* Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground leading-relaxed">
-            {session.summary}
-          </p>
-        </CardContent>
-      </Card>
+      {/* Audio Player & Transcript Tabs */}
+      <Tabs defaultValue="transcript" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="summary">Summary</TabsTrigger>
+          <TabsTrigger value="transcript">Transcript</TabsTrigger>
+          <TabsTrigger value="audio" className="flex items-center">
+            <Headphones className="h-4 w-4 mr-1" />
+            Audio
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Transcript */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Transcript</CardTitle>
-          <CardDescription>
-            Full transcription of your lecture
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-96 w-full border rounded-md p-4">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-              {session.transcript}
-            </p>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+        <TabsContent value="summary" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lecture Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                {session.summary}
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="transcript" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Full Transcript</CardTitle>
+              <CardDescription>
+                Complete transcription of your lecture
+                {currentPlaybackTime > 0 && (
+                  <span className="ml-2 text-primary">
+                    • Playing at {formatTime(currentPlaybackTime)}
+                  </span>
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-96 w-full border rounded-md p-4">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {session.transcript}
+                </p>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="audio" className="space-y-4">
+          <AudioPlayer
+            audioUrl={session.audioUrl}
+            transcript={session.transcript}
+            onTimeUpdate={setCurrentPlaybackTime}
+          />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Synchronized Transcript</CardTitle>
+              <CardDescription>
+                The transcript will highlight as you listen to the audio
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-64 w-full border rounded-md p-4">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {session.transcript}
+                </p>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
