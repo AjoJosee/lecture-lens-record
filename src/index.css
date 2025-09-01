@@ -9,56 +9,56 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Core background and text */
-    --background: 24 100% 97%;
-    --foreground: 0 0% 10%;
+    /* Core background and text - Complete black with orange accents */
+    --background: 0 0% 0%;
+    --foreground: 25 95% 53%;
 
-    /* Card and popover */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    /* Card and popover - Dark with orange borders */
+    --card: 0 0% 5%;
+    --card-foreground: 25 95% 53%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 25 95% 53%;
 
-    /* Primary - Orange */
+    /* Primary - Bright Orange */
     --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 25 95% 48%;
+    --primary-foreground: 0 0% 0%;
+    --primary-hover: 25 95% 60%;
 
-    /* Secondary - Light orange */
-    --secondary: 25 100% 95%;
-    --secondary-foreground: 25 95% 25%;
+    /* Secondary - Dark with orange tint */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 25 95% 53%;
 
-    /* Muted */
-    --muted: 24 100% 96%;
-    --muted-foreground: 0 0% 45%;
+    /* Muted - Very dark */
+    --muted: 0 0% 8%;
+    --muted-foreground: 25 50% 70%;
 
-    /* Accent - Dark orange */
-    --accent: 20 90% 48%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent - Bright orange */
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 0%;
 
     /* Warning */
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 0 0% 0%;
 
     /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 25 30% 85%;
-    --input: 25 30% 85%;
+    /* Borders and inputs - Orange borders */
+    --border: 25 95% 53%;
+    --input: 0 0% 10%;
     --ring: 25 95% 53%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(25 95% 53%), hsl(20 90% 48%));
-    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%), hsl(0 0% 20%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(24 100% 96%));
+    /* Gradients - Black to orange */
+    --gradient-primary: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 95% 40%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 0%), hsl(25 95% 53%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 5%), hsl(0 0% 10%));
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 10% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 10% / 0.1), 0 2px 4px -1px hsl(0 0% 10% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 10% / 0.1), 0 4px 6px -2px hsl(0 0% 10% / 0.05);
-    --shadow-primary: 0 4px 14px 0 hsl(25 95% 53% / 0.25);
+    /* Shadows - Orange glow */
+    --shadow-sm: 0 1px 2px 0 hsl(25 95% 53% / 0.15);
+    --shadow-md: 0 4px 6px -1px hsl(25 95% 53% / 0.25), 0 2px 4px -1px hsl(25 95% 53% / 0.15);
+    --shadow-lg: 0 10px 15px -3px hsl(25 95% 53% / 0.35), 0 4px 6px -2px hsl(25 95% 53% / 0.25);
+    --shadow-primary: 0 4px 14px 0 hsl(25 95% 53% / 0.5);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -66,51 +66,52 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --sidebar-background: 24 100% 97%;
-    --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 0 0% 10%;
-    --sidebar-primary-foreground: 24 100% 97%;
-    --sidebar-accent: 25 100% 95%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 25 30% 85%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 25 95% 53%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 25 95% 53%;
+    --sidebar-border: 25 95% 53%;
     --sidebar-ring: 25 95% 53%;
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 24 100% 95%;
+    /* Same as root for dark mode since we want complete black theme */
+    --background: 0 0% 0%;
+    --foreground: 25 95% 53%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 24 100% 95%;
+    --card: 0 0% 5%;
+    --card-foreground: 25 95% 53%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 24 100% 95%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 25 95% 53%;
 
     --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 10%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 24 100% 95%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 25 95% 53%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 25 50% 70%;
 
     --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 10%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 62% 45%;
-    --destructive-foreground: 24 100% 95%;
+    --destructive-foreground: 25 95% 53%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 25 95% 53%;
+    --input: 0 0% 10%;
     --ring: 25 95% 53%;
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 24 100% 95%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 25 95% 53%;
     --sidebar-primary: 25 95% 53%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 24 100% 95%;
-    --sidebar-border: 0 0% 15%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 25 95% 53%;
+    --sidebar-border: 25 95% 53%;
     --sidebar-ring: 25 95% 53%;
   }
 }
@@ -122,5 +123,15 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Add glow effects for standout projection */
+  .shadow-primary {
+    box-shadow: 0 0 20px hsl(25 95% 53% / 0.3);
+  }
+
+  /* Enhanced card styles for projection effect */
+  .card-glow {
+    box-shadow: 0 0 25px hsl(25 95% 53% / 0.2), inset 0 1px 0 hsl(25 95% 53% / 0.1);
   }
 }
