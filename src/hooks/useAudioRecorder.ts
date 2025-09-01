@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -9,8 +8,6 @@ export interface AudioRecorderState {
   isProcessing: boolean;
   uploadProgress: number;
   status: string;
-  showNameDialog: boolean;
-  recordedAudio: Blob | null;
 }
 
 export const useAudioRecorder = () => {
@@ -19,8 +16,6 @@ export const useAudioRecorder = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
-  const [showNameDialog, setShowNameDialog] = useState(false);
-  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -29,12 +24,8 @@ export const useAudioRecorder = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const processAudio = useCallback(async (audioBlob: Blob, sessionName: string): Promise<any> => {
+  const processAudio = useCallback(async (audioBlob: Blob): Promise<any> => {
     setUploadProgress(0);
-    setIsProcessing(true);
-    
-    // Create audio URL for playback
-    const audioUrl = URL.createObjectURL(audioBlob);
     
     // Simulate upload progress
     const progressInterval = setInterval(() => {
@@ -55,10 +46,9 @@ export const useAudioRecorder = () => {
         
         const sessionData = {
           id: Date.now(),
-          title: sessionName,
+          title: `Lecture ${new Date().toLocaleDateString()}`,
           date: new Date().toISOString(),
           duration: recordingTime,
-          audioUrl: audioUrl,
           transcript: "Today we discussed sorting algorithms, specifically focusing on quicksort and mergesort. Quicksort has an average time complexity of O(n log n) but can degrade to O(n²) in worst-case scenarios. Mergesort, on the other hand, maintains O(n log n) in all cases but requires additional O(n) space. We also covered the importance of choosing the right pivot in quicksort and how this affects performance. The divide-and-conquer approach used in both algorithms demonstrates fundamental computer science principles that apply to many problem-solving scenarios.",
           summary: "Lecture covered sorting algorithms including quicksort and mergesort, their time complexities, space requirements, and practical considerations for implementation. Key focus on divide-and-conquer strategies and pivot selection techniques."
         };
@@ -71,7 +61,7 @@ export const useAudioRecorder = () => {
 
         toast({
           title: "Processing Complete!",
-          description: `"${sessionName}" has been saved successfully`,
+          description: "Your lecture has been transcribed successfully",
         });
 
         setTimeout(() => {
@@ -81,7 +71,7 @@ export const useAudioRecorder = () => {
         resolve(sessionData);
       }, 3000);
     });
-  }, [recordingTime, toast, navigate]);
+  }, [recordingTime, toast]);
 
   const startRecording = useCallback(async () => {
     try {
@@ -96,8 +86,7 @@ export const useAudioRecorder = () => {
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setRecordedAudio(audioBlob);
-        setShowNameDialog(true);
+        processAudio(audioBlob);
       };
 
       mediaRecorder.start();
@@ -121,14 +110,15 @@ export const useAudioRecorder = () => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [processAudio, toast]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
-      setStatus("Recording stopped. Please name your session.");
+      setStatus("Processing recording...");
+      setIsProcessing(true);
       
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -136,27 +126,14 @@ export const useAudioRecorder = () => {
     }
   }, [isRecording]);
 
-  const saveSession = useCallback((sessionName: string) => {
-    if (recordedAudio) {
-      setShowNameDialog(false);
-      processAudio(recordedAudio, sessionName);
-    }
-  }, [recordedAudio, processAudio]);
-
-  const cancelSave = useCallback(() => {
-    setShowNameDialog(false);
-    setRecordedAudio(null);
-    setStatus("Recording cancelled");
-  }, []);
-
   const handleFileUpload = useCallback((file: File) => {
     if (file.type.startsWith('audio/')) {
-      setRecordedAudio(file);
-      setRecordingTime(300); // Default duration for uploaded files
-      setShowNameDialog(true);
+      setStatus(`Uploading ${file.name}...`);
+      setIsProcessing(true);
+      processAudio(file);
       toast({
         title: "File Uploaded",
-        description: `Ready to process ${file.name}...`,
+        description: `Processing ${file.name}...`,
       });
     } else {
       setStatus("Please select a valid audio file");
@@ -166,7 +143,7 @@ export const useAudioRecorder = () => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [processAudio, toast]);
 
   const reset = useCallback(() => {
     setIsRecording(false);
@@ -174,8 +151,6 @@ export const useAudioRecorder = () => {
     setIsProcessing(false);
     setUploadProgress(0);
     setStatus("");
-    setShowNameDialog(false);
-    setRecordedAudio(null);
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
@@ -188,15 +163,11 @@ export const useAudioRecorder = () => {
       isProcessing,
       uploadProgress,
       status,
-      showNameDialog,
-      recordedAudio,
     },
     actions: {
       startRecording,
       stopRecording,
       handleFileUpload,
-      saveSession,
-      cancelSave,
       reset,
     },
   };
