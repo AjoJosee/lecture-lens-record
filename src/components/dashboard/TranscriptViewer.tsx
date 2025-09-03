@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, FileText, Clock, Calendar } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Download, FileText, Clock, Calendar, Volume2, FileType } from "lucide-react";
 import jsPDF from 'jspdf';
 import AudioPlayer from './AudioPlayer';
 
@@ -99,41 +100,62 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
         </CardHeader>
       </Card>
 
-      {/* Audio Player - only show if audioUrl exists */}
-      {session.audioUrl && (
-        <AudioPlayer
-          audioUrl={session.audioUrl}
-          transcript={session.transcript}
-        />
-      )}
-
-      {/* Summary */}
+      {/* Tabbed Content */}
       <Card>
-        <CardHeader>
-          <CardTitle>Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground leading-relaxed">
-            {session.summary}
-          </p>
-        </CardContent>
-      </Card>
+        <Tabs defaultValue="summary" className="w-full">
+          <CardHeader className="pb-3">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="summary" className="flex items-center gap-2">
+                <FileType className="h-4 w-4" />
+                Summary
+              </TabsTrigger>
+              <TabsTrigger value="transcript" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Transcript
+              </TabsTrigger>
+              <TabsTrigger value="audio" className="flex items-center gap-2">
+                <Volume2 className="h-4 w-4" />
+                Audio
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
+          
+          <CardContent>
+            <TabsContent value="summary" className="mt-0">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Session Summary</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {session.summary}
+                </p>
+              </div>
+            </TabsContent>
 
-      {/* Transcript */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Transcript</CardTitle>
-          <CardDescription>
-            Full transcription of your lecture
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-96 w-full border rounded-md p-4">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-              {session.transcript}
-            </p>
-          </ScrollArea>
-        </CardContent>
+            <TabsContent value="transcript" className="mt-0">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Full Transcript</h3>
+                <ScrollArea className="h-96 w-full border rounded-md p-4">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {session.transcript}
+                  </p>
+                </ScrollArea>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="audio" className="mt-0">
+              {session.audioUrl ? (
+                <AudioPlayer
+                  audioUrl={session.audioUrl}
+                  transcript={session.transcript}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <Volume2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No audio available for this session</p>
+                </div>
+              )}
+            </TabsContent>
+          </CardContent>
+        </Tabs>
       </Card>
     </div>
   );

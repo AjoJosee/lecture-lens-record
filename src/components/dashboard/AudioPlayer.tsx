@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Play, Pause, RotateCcw, Volume2 } from "lucide-react";
 
 interface AudioPlayerProps {
@@ -13,10 +14,15 @@ interface AudioPlayerProps {
 
 const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+
+  // Split transcript into words for highlighting
+  const words = transcript.split(' ');
+  const wordsPerSecond = words.length / (duration || 1);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -88,61 +94,120 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Calculate which words should be highlighted based on current time
+  const getCurrentWordIndex = () => {
+    return Math.floor(currentTime * wordsPerSecond);
+  };
+
+  const renderLiveTranscript = () => {
+    const currentWordIndex = getCurrentWordIndex();
+    const highlightRange = 5; // Highlight current word and next few words
+
+    return words.map((word, index) => {
+      const isHighlighted = index >= currentWordIndex && index < currentWordIndex + highlightRange;
+      const isCurrent = index === currentWordIndex;
+      
+      return (
+        <span
+          key={index}
+          className={`${
+            isCurrent 
+              ? 'bg-primary text-primary-foreground px-1 rounded' 
+              : isHighlighted 
+                ? 'bg-accent text-accent-foreground px-1 rounded' 
+                : 'text-muted-foreground'
+          } transition-colors duration-300`}
+        >
+          {word}{' '}
+        </span>
+      );
+    });
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Volume2 className="h-5 w-5 mr-2" />
-          Audio Playback
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <audio ref={audioRef} src={audioUrl} preload="metadata" />
-        
-        {/* Main Controls */}
-        <div className="flex items-center space-x-4">
-          <Button
-            onClick={togglePlayPause}
-            size="sm"
-            className="bg-primary hover:bg-primary/90"
-          >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
+    <div className="space-y-6">
+      {/* Audio Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Volume2 className="h-5 w-5 mr-2" />
+            Audio Controls
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <audio ref={audioRef} src={audioUrl} preload="metadata" />
           
-          <Button onClick={resetAudio} size="sm" variant="outline">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
+          {/* Main Controls */}
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={togglePlayPause}
+              size="sm"
+              className="bg-primary hover:bg-primary/90"
+            >
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+            
+            <Button onClick={resetAudio} size="sm" variant="outline">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
 
-          <div className="flex items-center space-x-2 flex-1">
-            <span className="text-sm text-muted-foreground min-w-[45px]">
-              {formatTime(currentTime)}
-            </span>
-            <Slider
-              value={[currentTime]}
-              onValueChange={handleSeek}
-              max={duration || 100}
-              step={1}
-              className="flex-1"
-            />
-            <span className="text-sm text-muted-foreground min-w-[45px]">
-              {formatTime(duration)}
-            </span>
+            <div className="flex items-center space-x-2 flex-1">
+              <span className="text-sm text-muted-foreground min-w-[45px]">
+                {formatTime(currentTime)}
+              </span>
+              <Slider
+                value={[currentTime]}
+                onValueChange={handleSeek}
+                max={duration || 100}
+                step={1}
+                className="flex-1"
+              />
+              <span className="text-sm text-muted-foreground min-w-[45px]">
+                {formatTime(duration)}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Volume Control */}
-        <div className="flex items-center space-x-2">
-          <Volume2 className="h-4 w-4 text-muted-foreground" />
-          <Slider
-            value={[volume]}
-            onValueChange={handleVolumeChange}
-            max={1}
-            step={0.1}
-            className="w-24"
-          />
-        </div>
-      </CardContent>
-    </Card>
+          {/* Volume Control */}
+          <div className="flex items-center space-x-2">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <Slider
+              value={[volume]}
+              onValueChange={handleVolumeChange}
+              max={1}
+              step={0.1}
+              className="w-24"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Live Transcript */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Live Transcript</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea ref={scrollAreaRef} className="h-64 w-full border rounded-md p-4">
+            <div className="text-sm leading-relaxed">
+              {renderLiveTranscript()}
+            </div>
+          </ScrollArea>
+          <div className="mt-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-primary rounded"></div>
+                <span>Current word</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-accent rounded"></div>
+                <span>Upcoming words</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
