@@ -1,10 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Clock, Calendar, Volume2, FileType } from "lucide-react";
+import { Download, FileText, Clock, Calendar, Volume2, FileType, ClipboardList, CheckSquare } from "lucide-react";
 import jsPDF from 'jspdf';
 import AudioPlayer from './AudioPlayer';
 
@@ -70,6 +69,42 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
     doc.save(`${session.title.replace(/\s+/g, '_')}.pdf`);
   };
 
+  // Extract important tasks from the transcript (simple implementation)
+  const extractImportantTasks = () => {
+    const transcript = session.transcript.toLowerCase();
+    const tasks = [];
+    
+    // Look for common task indicators
+    const taskIndicators = [
+      'assignment',
+      'homework',
+      'project',
+      'due date',
+      'submit',
+      'complete',
+      'finish',
+      'work on',
+      'prepare',
+      'study',
+      'review',
+      'practice'
+    ];
+    
+    const sentences = session.transcript.split(/[.!?]+/);
+    sentences.forEach((sentence, index) => {
+      const lowerSentence = sentence.toLowerCase();
+      if (taskIndicators.some(indicator => lowerSentence.includes(indicator))) {
+        tasks.push(sentence.trim());
+      }
+    });
+    
+    return tasks.length > 0 ? tasks.slice(0, 5) : [
+      "Review today's lecture materials",
+      "Complete assigned readings",
+      "Prepare for next session"
+    ];
+  };
+
   return (
     <div className="space-y-6">
       {/* Session Header */}
@@ -122,12 +157,41 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
           
           <CardContent>
             <TabsContent value="summary" className="mt-0">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Session Summary</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {session.summary}
-                </p>
-              </div>
+              <Tabs defaultValue="session-summary" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="session-summary" className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4" />
+                    Session Summary
+                  </TabsTrigger>
+                  <TabsTrigger value="important-tasks" className="flex items-center gap-2">
+                    <CheckSquare className="h-4 w-4" />
+                    Important Tasks
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="session-summary" className="mt-0">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Session Summary</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {session.summary}
+                    </p>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="important-tasks" className="mt-0">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Important Tasks</h3>
+                    <div className="space-y-3">
+                      {extractImportantTasks().map((task, index) => (
+                        <div key={index} className="flex items-start space-x-3 p-3 bg-muted rounded-lg">
+                          <CheckSquare className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                          <p className="text-sm leading-relaxed">{task}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
 
             <TabsContent value="transcript" className="mt-0">

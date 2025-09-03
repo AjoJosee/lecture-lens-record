@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, Mic, FileText, LogOut, User } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import PageHeader from "@/components/ui/PageHeader";
 import SessionCard from "@/components/dashboard/SessionCard";
 import TranscriptViewer from "@/components/dashboard/TranscriptViewer";
@@ -16,6 +17,7 @@ interface SessionData {
   duration: number;
   transcript: string;
   summary: string;
+  audioUrl?: string;
 }
 
 const Dashboard = () => {
@@ -90,6 +92,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Welcome back, {user.name}</p>
           </div>
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <Button onClick={() => navigate('/recorder')} className="bg-accent hover:bg-accent/90 text-white">
               <Mic className="h-4 w-4 mr-2" />
               New Recording
