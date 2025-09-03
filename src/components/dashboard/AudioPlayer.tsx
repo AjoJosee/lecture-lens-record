@@ -33,16 +33,25 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
       onTimeUpdate?.(audio.currentTime);
     };
 
-    const updateDuration = () => setDuration(audio.duration);
+    const updateDuration = () => {
+      const d = audio.duration;
+      if (!Number.isFinite(d) || Number.isNaN(d) || d === Infinity) {
+        setDuration(0);
+      } else {
+        setDuration(d);
+      }
+    };
     const handleEnded = () => setIsPlaying(false);
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('durationchange', updateDuration);
     audio.addEventListener('ended', handleEnded);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('durationchange', updateDuration);
       audio.removeEventListener('ended', handleEnded);
     };
   }, [onTimeUpdate]);
@@ -89,6 +98,9 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
   };
 
   const formatTime = (seconds: number) => {
+    if (!Number.isFinite(seconds) || Number.isNaN(seconds) || seconds <= 0) {
+      return '00:00';
+    }
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -158,7 +170,7 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
               <Slider
                 value={[currentTime]}
                 onValueChange={handleSeek}
-                max={duration || 100}
+                max={Number.isFinite(duration) && duration > 0 ? duration : 100}
                 step={1}
                 className="flex-1"
               />

@@ -64,7 +64,7 @@ const Login = () => {
                 <TabsContent value="login" className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="student@university.edu" />
+                    <Input id="email" type="email" placeholder="person@gmail.com" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
@@ -86,7 +86,7 @@ const Login = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email-signup">Email</Label>
-                    <Input id="email-signup" type="email" placeholder="student@university.edu" />
+                    <Input id="email-signup" type="email" placeholder="person@gmail.com" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password-signup">Password</Label>
