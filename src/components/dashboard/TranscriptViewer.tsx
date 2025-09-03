@@ -73,29 +73,26 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
   return (
     <div className="space-y-6">
       {/* Session Header */}
-      <Card className="bg-gradient-to-r from-white to-primary/5 border-primary/20 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/10 rounded-t-lg">
+      <Card className="bg-gradient-card">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl flex items-center text-primary">
+              <CardTitle className="text-2xl flex items-center">
                 <FileText className="h-6 w-6 mr-2" />
                 {session.title}
               </CardTitle>
-              <CardDescription className="flex items-center space-x-4 mt-2 text-primary/70">
+              <CardDescription className="flex items-center space-x-4 mt-2">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
                   {formatDate(session.date)}
                 </span>
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                <Badge variant="secondary">
                   <Clock className="h-3 w-3 mr-1" />
                   {formatTime(session.duration)}
                 </Badge>
               </CardDescription>
             </div>
-            <Button 
-              onClick={downloadPDF} 
-              className="bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary shadow-primary text-white font-semibold"
-            >
+            <Button onClick={downloadPDF} className="bg-accent hover:bg-accent/90">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
@@ -104,73 +101,56 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
       </Card>
 
       {/* Tabbed Content */}
-      <Card className="bg-white/80 backdrop-blur-sm border-primary/10 shadow-lg">
+      <Card>
         <Tabs defaultValue="summary" className="w-full">
-          <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-secondary/10 rounded-t-lg">
-            <TabsList className="grid w-full grid-cols-3 bg-white/50 border border-primary/20">
-              <TabsTrigger 
-                value="summary" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-primary text-primary"
-              >
+          <CardHeader className="pb-3">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="summary" className="flex items-center gap-2">
                 <FileType className="h-4 w-4" />
                 Summary
               </TabsTrigger>
-              <TabsTrigger 
-                value="transcript" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-primary text-primary"
-              >
+              <TabsTrigger value="transcript" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Transcript
               </TabsTrigger>
-              <TabsTrigger 
-                value="audio" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-primary text-primary"
-              >
+              <TabsTrigger value="audio" className="flex items-center gap-2">
                 <Volume2 className="h-4 w-4" />
                 Audio
               </TabsTrigger>
             </TabsList>
           </CardHeader>
           
-          <CardContent className="p-6">
+          <CardContent>
             <TabsContent value="summary" className="mt-0">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Session Summary</h3>
-                <div className="bg-gradient-to-br from-primary/5 to-secondary/10 rounded-lg p-6 border border-primary/10">
-                  <p className="text-muted-foreground leading-relaxed">
-                    {session.summary}
-                  </p>
-                </div>
+                <h3 className="text-lg font-semibold">Session Summary</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {session.summary}
+                </p>
               </div>
             </TabsContent>
 
             <TabsContent value="transcript" className="mt-0">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Full Transcript</h3>
-                <ScrollArea className="h-96 w-full border border-primary/20 rounded-md bg-gradient-to-br from-white to-primary/5">
-                  <div className="p-4">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {session.transcript}
-                    </p>
-                  </div>
+                <h3 className="text-lg font-semibold">Full Transcript</h3>
+                <ScrollArea className="h-96 w-full border rounded-md p-4">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {session.transcript}
+                  </p>
                 </ScrollArea>
               </div>
             </TabsContent>
 
             <TabsContent value="audio" className="mt-0">
               {session.audioUrl ? (
-                <div className="bg-gradient-to-br from-primary/5 to-secondary/10 rounded-lg p-6 border border-primary/10">
-                  <AudioPlayer
-                    audioUrl={session.audioUrl}
-                    transcript={session.transcript}
-                  />
-                </div>
+                <AudioPlayer
+                  audioUrl={session.audioUrl}
+                  transcript={session.transcript}
+                />
               ) : (
-                <div className="text-center py-12 bg-gradient-to-br from-primary/5 to-secondary/10 rounded-lg border border-primary/10">
-                  <div className="bg-white rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center shadow-lg">
-                    <Volume2 className="h-12 w-12 text-primary" />
-                  </div>
-                  <p className="text-muted-foreground text-lg">No audio available for this session</p>
+                <div className="text-center py-8">
+                  <Volume2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No audio available for this session</p>
                 </div>
               )}
             </TabsContent>
