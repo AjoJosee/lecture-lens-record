@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar } from "lucide-react";
@@ -34,24 +35,24 @@ const SessionCard = ({ session, onClick }: SessionCardProps) => {
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-lg transition-shadow bg-gradient-subtle border-primary/20"
+      className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white to-primary/5 border-primary/20 hover:border-primary/40 hover:scale-[1.02] hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary/10"
       onClick={onClick}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{session.title}</CardTitle>
-          <Badge variant="secondary">
+          <CardTitle className="text-lg text-primary">{session.title}</CardTitle>
+          <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
             <Clock className="h-3 w-3 mr-1" />
             {formatTime(session.duration)}
           </Badge>
         </div>
-        <CardDescription className="flex items-center text-sm">
+        <CardDescription className="flex items-center text-sm text-primary/70">
           <Calendar className="h-3 w-3 mr-1" />
           {formatDate(session.date)}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground line-clamp-2">
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
           {session.summary}
         </p>
       </CardContent>
