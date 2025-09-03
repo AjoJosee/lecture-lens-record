@@ -94,7 +94,7 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Button onClick={() => navigate('/recorder')} className="bg-primary hover:bg-primary-hover text-primary-foreground">
+            <Button onClick={() => navigate('/recorder')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Mic className="h-4 w-4 mr-2" />
               New Recording
             </Button>
@@ -116,7 +116,7 @@ const Dashboard = () => {
                   Recent Sessions
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  {sessions.length} total recordings
+                  <span className="text-foreground font-medium">{sessions.length}</span> total recordings
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -125,7 +125,7 @@ const Dashboard = () => {
                     <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground mb-4">No recordings yet</p>
                     <div className="space-y-2">
-                      <Button onClick={() => navigate('/recorder')} className="w-full bg-primary hover:bg-primary-hover text-primary-foreground">
+                      <Button onClick={() => navigate('/recorder')} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Plus className="h-4 w-4 mr-2" />
                         Record First Lecture
                       </Button>
@@ -169,7 +169,7 @@ const Dashboard = () => {
                   </CardDescription>
                   <Button 
                     onClick={() => navigate('/recorder')}
-                    className="bg-primary hover:bg-primary-hover text-primary-foreground"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create New Recording
