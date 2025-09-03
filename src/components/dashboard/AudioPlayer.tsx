@@ -127,9 +127,9 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
   return (
     <div className="space-y-6">
       {/* Audio Controls */}
-      <Card>
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="flex items-center">
+          <CardTitle className="flex items-center text-card-foreground">
             <Volume2 className="h-5 w-5 mr-2" />
             Audio Controls
           </CardTitle>
@@ -142,12 +142,12 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
             <Button
               onClick={togglePlayPause}
               size="sm"
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary-hover text-primary-foreground"
             >
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
             
-            <Button onClick={resetAudio} size="sm" variant="outline">
+            <Button onClick={resetAudio} size="sm" variant="outline" className="border-border text-foreground hover:bg-accent hover:text-accent-foreground">
               <RotateCcw className="h-4 w-4" />
             </Button>
 
@@ -183,12 +183,12 @@ const AudioPlayer = ({ audioUrl, transcript, onTimeUpdate }: AudioPlayerProps) =
       </Card>
 
       {/* Live Transcript */}
-      <Card>
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle>Live Transcript</CardTitle>
+          <CardTitle className="text-card-foreground">Live Transcript</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea ref={scrollAreaRef} className="h-64 w-full border rounded-md p-4">
+          <ScrollArea ref={scrollAreaRef} className="h-64 w-full border border-border rounded-md p-4 bg-background">
             <div className="text-sm leading-relaxed">
               {renderLiveTranscript()}
             </div>

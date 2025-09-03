@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -108,26 +109,26 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
   return (
     <div className="space-y-6">
       {/* Session Header */}
-      <Card className="bg-gradient-card">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl flex items-center">
+              <CardTitle className="text-2xl flex items-center text-card-foreground">
                 <FileText className="h-6 w-6 mr-2" />
                 {session.title}
               </CardTitle>
-              <CardDescription className="flex items-center space-x-4 mt-2">
+              <CardDescription className="flex items-center space-x-4 mt-2 text-muted-foreground">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
                   {formatDate(session.date)}
                 </span>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
                   <Clock className="h-3 w-3 mr-1" />
                   {formatTime(session.duration)}
                 </Badge>
               </CardDescription>
             </div>
-            <Button onClick={downloadPDF} className="bg-accent hover:bg-accent/90">
+            <Button onClick={downloadPDF} className="bg-primary hover:bg-primary-hover text-primary-foreground">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
@@ -136,19 +137,19 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
       </Card>
 
       {/* Tabbed Content */}
-      <Card>
+      <Card className="bg-card border-border">
         <Tabs defaultValue="summary" className="w-full">
           <CardHeader className="pb-3">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="summary" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
+              <TabsTrigger value="summary" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <FileType className="h-4 w-4" />
                 Summary
               </TabsTrigger>
-              <TabsTrigger value="transcript" className="flex items-center gap-2">
+              <TabsTrigger value="transcript" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <FileText className="h-4 w-4" />
                 Transcript
               </TabsTrigger>
-              <TabsTrigger value="audio" className="flex items-center gap-2">
+              <TabsTrigger value="audio" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <Volume2 className="h-4 w-4" />
                 Audio
               </TabsTrigger>
@@ -158,12 +159,12 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
           <CardContent>
             <TabsContent value="summary" className="mt-0">
               <Tabs defaultValue="session-summary" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="session-summary" className="flex items-center gap-2">
+                <TabsList className="grid w-full grid-cols-2 mb-4 bg-muted">
+                  <TabsTrigger value="session-summary" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
                     <ClipboardList className="h-4 w-4" />
                     Session Summary
                   </TabsTrigger>
-                  <TabsTrigger value="important-tasks" className="flex items-center gap-2">
+                  <TabsTrigger value="important-tasks" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
                     <CheckSquare className="h-4 w-4" />
                     Important Tasks
                   </TabsTrigger>
@@ -171,7 +172,7 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
                 
                 <TabsContent value="session-summary" className="mt-0">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Session Summary</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Session Summary</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {session.summary}
                     </p>
@@ -180,12 +181,12 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
                 
                 <TabsContent value="important-tasks" className="mt-0">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Important Tasks</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Important Tasks</h3>
                     <div className="space-y-3">
                       {extractImportantTasks().map((task, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-3 bg-muted rounded-lg">
+                        <div key={index} className="flex items-start space-x-3 p-3 bg-muted rounded-lg border border-border">
                           <CheckSquare className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <p className="text-sm leading-relaxed">{task}</p>
+                          <p className="text-sm leading-relaxed text-foreground">{task}</p>
                         </div>
                       ))}
                     </div>
@@ -196,9 +197,9 @@ const TranscriptViewer = ({ session }: TranscriptViewerProps) => {
 
             <TabsContent value="transcript" className="mt-0">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Full Transcript</h3>
-                <ScrollArea className="h-96 w-full border rounded-md p-4">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                <h3 className="text-lg font-semibold text-foreground">Full Transcript</h3>
+                <ScrollArea className="h-96 w-full border border-border rounded-md p-4 bg-background">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
                     {session.transcript}
                   </p>
                 </ScrollArea>

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Mic, Square } from "lucide-react";
 
@@ -20,7 +21,7 @@ const RecordingControls = ({
         size="lg"
         onClick={onStartRecording}
         disabled={isRecording || isProcessing}
-        className="bg-accent hover:bg-accent/90 text-white px-8 py-4 text-lg shadow-primary"
+        className="bg-primary hover:bg-primary-hover text-primary-foreground px-8 py-4 text-lg shadow-primary"
       >
         <Mic className="h-6 w-6 mr-2" />
         Start Recording

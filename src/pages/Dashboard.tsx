@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -83,21 +84,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
             <p className="text-muted-foreground">Welcome back, {user.name}</p>
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Button onClick={() => navigate('/recorder')} className="bg-accent hover:bg-accent/90 text-white">
+            <Button onClick={() => navigate('/recorder')} className="bg-primary hover:bg-primary-hover text-primary-foreground">
               <Mic className="h-4 w-4 mr-2" />
               New Recording
             </Button>
-            <Button variant="outline" onClick={handleLogout}>
+            <Button variant="outline" onClick={handleLogout} className="border-border text-foreground hover:bg-accent hover:text-accent-foreground">
               <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
@@ -108,13 +109,13 @@ const Dashboard = () => {
           {/* Sidebar - Recent Sessions */}
           <div className="lg:col-span-1 space-y-4">
             {/* Recent Sessions */}
-            <Card>
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-card-foreground">
                   <FileText className="h-5 w-5 mr-2" />
                   Recent Sessions
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-muted-foreground">
                   {sessions.length} total recordings
                 </CardDescription>
               </CardHeader>
@@ -124,11 +125,11 @@ const Dashboard = () => {
                     <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground mb-4">No recordings yet</p>
                     <div className="space-y-2">
-                      <Button onClick={() => navigate('/recorder')} className="w-full">
+                      <Button onClick={() => navigate('/recorder')} className="w-full bg-primary hover:bg-primary-hover text-primary-foreground">
                         <Plus className="h-4 w-4 mr-2" />
                         Record First Lecture
                       </Button>
-                      <Button variant="outline" onClick={addSampleSession} className="w-full">
+                      <Button variant="outline" onClick={addSampleSession} className="w-full border-border text-foreground hover:bg-accent hover:text-accent-foreground">
                         Add Sample Session
                       </Button>
                     </div>
@@ -159,16 +160,16 @@ const Dashboard = () => {
             {selectedSession ? (
               <TranscriptViewer session={selectedSession} />
             ) : (
-              <Card className="h-96 flex items-center justify-center">
+              <Card className="h-96 flex items-center justify-center bg-card border-border">
                 <CardContent className="text-center">
                   <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <CardTitle className="mb-2">No Session Selected</CardTitle>
-                  <CardDescription className="mb-6">
+                  <CardTitle className="mb-2 text-card-foreground">No Session Selected</CardTitle>
+                  <CardDescription className="mb-6 text-muted-foreground">
                     Select a session from the sidebar or create a new recording to get started
                   </CardDescription>
                   <Button 
                     onClick={() => navigate('/recorder')}
-                    className="bg-accent hover:bg-accent/90 text-white"
+                    className="bg-primary hover:bg-primary-hover text-primary-foreground"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create New Recording
